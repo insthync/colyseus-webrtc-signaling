@@ -8,14 +8,22 @@ export class SignalingRoom extends Room {
   }
 
   onCandidate(client: Client, message: any) {
-    this.broadcast("candidate", message, {
-      except: client
+    this.clients.forEach((value: Client, index: number, array: Client[]) => {
+      if (value.sessionId == message.sessionId) {
+        message.sessionId = client.sessionId;
+        value.send("candidate", message);
+        return;
+      }
     });
   }
 
   onDesc(client: Client, message: any) {
-    this.broadcast("desc", message, {
-      except: client
+    this.clients.forEach((value: Client, index: number, array: Client[]) => {
+      if (value.sessionId == message.sessionId) {
+        message.sessionId = client.sessionId;
+        value.send("desc", message);
+        return;
+      }
     });
   }
 
