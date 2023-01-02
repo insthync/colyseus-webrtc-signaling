@@ -22,11 +22,11 @@ export class SignalingRoom extends Room {
   onJoin(client: Client, options: any) {
     console.log(client.sessionId, "joined!");
     this.clients.forEach((value: Client, index: number, array: Client[]) => {
-      value.send("addPeer", {
-        sessionId: client.sessionId,
-        shouldCreateOffer: false,
-      });
       if (value.sessionId != client.sessionId) {
+        value.send("addPeer", {
+          sessionId: client.sessionId,
+          shouldCreateOffer: false,
+        });
         client.send("addPeer", {
           sessionId: value.sessionId,
           shouldCreateOffer: true,
