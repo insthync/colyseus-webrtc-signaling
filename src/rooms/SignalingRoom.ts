@@ -37,6 +37,9 @@ export class SignalingRoom extends Room {
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, "left!");
+    this.broadcast("removePeer", client.sessionId, {
+      except: client,
+    });
   }
 
   onDispose() {
