@@ -13,7 +13,7 @@ export default Arena({
         /**
          * Define your room handlers:
          */
-        gameServer.define('signaling', SignalingRoom);
+        gameServer.define('signalingRoom', SignalingRoom);
 
     },
 
