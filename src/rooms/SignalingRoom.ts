@@ -8,28 +8,31 @@ export class SignalingRoom extends Room {
   }
 
   onCandidate(client: Client, message: any) {
-    this.clients.forEach((value: Client, index: number, array: Client[]) => {
+    for (let index = 0; index < this.clients.length; index++) {
+      const value = this.clients[index];
       if (value.sessionId == message.sessionId) {
         message.sessionId = client.sessionId;
         value.send("candidate", message);
-        return;
+        break;
       }
-    });
+    }
   }
 
   onDesc(client: Client, message: any) {
-    this.clients.forEach((value: Client, index: number, array: Client[]) => {
+    for (let index = 0; index < this.clients.length; index++) {
+      const value = this.clients[index];
       if (value.sessionId == message.sessionId) {
         message.sessionId = client.sessionId;
         value.send("desc", message);
-        return;
+        break;
       }
-    });
+    }
   }
 
   onJoin(client: Client, options: any) {
     console.log(client.sessionId, "joined!");
-    this.clients.forEach((value: Client, index: number, array: Client[]) => {
+    for (let index = 0; index < this.clients.length; index++) {
+      const value = this.clients[index];
       if (value.sessionId != client.sessionId) {
         value.send("addPeer", {
           sessionId: client.sessionId,
@@ -40,7 +43,7 @@ export class SignalingRoom extends Room {
           shouldCreateOffer: true,
         });
       }
-    });
+    }
   }
 
   onLeave(client: Client, consented: boolean) {
