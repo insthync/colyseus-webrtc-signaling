@@ -3,23 +3,33 @@ import { Room, Client } from "colyseus";
 export class SignalingRoom extends Room {
 
   onCreate(options: any) {
-    this.onMessage("offer", this.onOffer.bind(this));
     this.onMessage("candidate", this.onCandidate.bind(this));
-  }
-
-  onOffer(client: Client, message: any) {
-    const sessionDescription = message.sessionDescription;
-    this.broadcast("offer", {
-      sessionId: client.sessionId,
-      sessionDescription: sessionDescription,
-    });
+    this.onMessage("desc", this.onDesc.bind(this));
   }
 
   onCandidate(client: Client, message: any) {
+    const sessionId = message.sessionId;
     const candidate = message.candidate;
+    const sdpMid = message.sdpMid;
+    const sdpMLineIndex = message.sdpMLineIndex;
     this.broadcast("candidate", {
-      sessionId: client.sessionId,
+      sessionId: sessionId,
       candidate: candidate,
+      sdpMid: sdpMid,
+      sdpMLineIndex: sdpMLineIndex,
+    }, {
+      except: client
+    });
+  }
+
+  onDesc(client: Client, message: any) {
+    const sessionId = message.sessionId;
+    const type = message.type;
+    const sdp = message.sdp;
+    this.broadcast("desc", {
+      sessionId: sessionId,
+      type: type,
+      sdp: sdp,
     }, {
       except: client
     });
@@ -28,11 +38,16 @@ export class SignalingRoom extends Room {
   onJoin(client: Client, options: any) {
     console.log(client.sessionId, "joined!");
     this.clients.forEach((value: Client, index: number, array: Client[]) => {
-      const shouldCreateOffer = value.sessionId != client.sessionId;
       value.send("addPeer", {
-        sessionId: value.sessionId,
-        shouldCreateOffer: shouldCreateOffer,
+        sessionId: client.sessionId,
+        shouldCreateOffer: false,
       });
+      if (value.sessionId != client.sessionId) {
+        client.send("addPeer", {
+          sessionId: value.sessionId,
+          shouldCreateOffer: true,
+        });
+      }
     });
   }
 
